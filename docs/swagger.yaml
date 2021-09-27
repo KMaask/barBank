@@ -52,3 +52,100 @@ paths:
           description: Username already exists
       deprecated: false
       summary: New user register
+  /sessions:
+    summary: Create a session
+    post:
+      requestBody:
+        description: A new `session` creation.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/session'
+            examples:
+              POST /sessions request body:
+                value:
+                  username: usernameabc
+                  password: novichok
+        required: true
+      tags:
+        - sessions
+      responses:
+        '201':
+          content:
+            application/json:
+              examples:
+                201 response:
+                  value:
+                    token: 614b84f2b406b91a96ab846d
+          description: Successful response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                Invalid credentials:
+                  value:
+                    error: Invalid credentials
+          description: Invalid credentials
+      operationId: createsession
+      summary: Create a session
+    delete:
+      tags:
+        - sessions
+      responses:
+        '204':
+          description: Successful logout
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                Invalid Authorization header:
+                  value:
+                    error: Invalid Authorization header
+                Invalid token:
+                  value:
+                    error: Invalid token
+                Invalid authorization header format:
+                  value:
+                    error: Invalid authorization header format
+                Missing Authorization header:
+                  value:
+                    error: Missing Authorization header
+          description: Invalid Authorization header
+      security:
+        -
+          Baerer: []
+components:
+  schemas:
+    session:
+      description: ''
+      type: object
+    user:
+      description: ''
+      required: []
+      type: object
+      properties:
+        username:
+          description: ''
+          type: string
+        password:
+          description: ''
+          type: string
+        name:
+          description: ''
+          type: string
+    error:
+      description: ''
+      type: object
+      properties:
+        error:
+          type: string
+      example:
+        error: error message
+  securitySchemes:
+    Baerer:
+      scheme: bearer
+      type: http
