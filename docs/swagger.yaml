@@ -118,6 +118,32 @@ paths:
       security:
         -
           Baerer: []
+  /users/current:
+    get:
+      tags:
+        - users
+      responses:
+        '200':
+          description: Succesful request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                Missing Authorization header:
+                  value:
+                    error: Missing Authorization header
+                Invalid token:
+                  value:
+                    error: Invalid token
+                Invalid Authorization header format:
+                  value:
+                    error: Invalid Authorization header format
+          description: Unauthorized
+      security:
+        -
+          Baerer: []
 components:
   schemas:
     session:

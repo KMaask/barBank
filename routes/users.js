@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/User')
 const Account = require('../models/Account')
 const bcrypt = require('bcrypt')
+const {verifyToken} = require("../middlewares");
 
 
 router.post('/', async (req, res) => {
@@ -33,5 +34,21 @@ router.post('/', async (req, res) => {
 
     }
 
+});
+
+router.get('/current',verifyToken, async (req, res) => {
+
+    //Get user object from DB
+    const user = await User.findOne({_id: req.userId});
+
+    //Get user`s accounts
+    const accounts = await Account.find({userId: req.userId});
+
+    res.status(200).send( {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        accounts: accounts
+    })
 });
 module.exports = router
