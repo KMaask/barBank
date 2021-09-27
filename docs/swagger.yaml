@@ -1,0 +1,54 @@
+openapi: 3.0.2
+info:
+  title: barBank
+  version: 1.0.0
+  contact: {}
+  license:
+    name: Mozilla 2.0
+    url: 'https://www.mozilla.org/en-US/MPL/2.0/'
+paths:
+  /users:
+    post:
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              type: string
+            examples:
+              Curl:
+                value:
+                  name: New guide user
+                  username: usernameabc
+                  password: novichok
+        required: false
+      tags:
+        - users
+      responses:
+        '201':
+          description: "\r\nUser successfully registered."
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                Invalid password:
+                  value:
+                    error: Invalid password
+                Parameter is required:
+                  value:
+                    error: 'User validation failed: .*: Path `.*` is required'
+          description: Bad request
+        '409':
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                Username already exists:
+                  value:
+                    error: Username already exists
+          description: Username already exists
+      deprecated: false
+      summary: New user register
