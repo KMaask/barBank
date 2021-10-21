@@ -16,10 +16,10 @@ paths:
             schema:
               type: string
             examples:
-              Curl:
+              POST /users:
                 value:
-                  name: New guide user
-                  username: usernameabc
+                  name: Steam
+                  username: steamuser
                   password: novichok
         required: false
       tags:
@@ -64,7 +64,7 @@ paths:
             examples:
               POST /sessions request body:
                 value:
-                  username: usernameabc
+                  username: steamuser
                   password: novichok
         required: true
       tags:
@@ -76,7 +76,7 @@ paths:
               examples:
                 201 response:
                   value:
-                    token: 614b84f2b406b91a96ab846d
+                    token: 615bff2c521653b4a1969ab2
           description: Successful response.
         '401':
           content:
@@ -144,6 +144,90 @@ paths:
       security:
         -
           Baerer: []
+  /transactions:
+    summary: Path used to manage the list of transactions.
+    description: >-
+      The REST endpoint/path used to list and create zero or more `transaction` entities.  This path
+      contains a `GET` and `POST` operation to perform the list and create tasks, respectively.
+    post:
+      requestBody:
+        description: A new `transaction` to be created.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transaction'
+            examples:
+              POST /transaction:
+                value:
+                  accountFrom: 1b784bb50b65304f534480390cc90aafcbc
+                  accountTo: 1b788818551170b598016f5c7abf7b16891
+                  amount: 200
+                  currency: EUR
+                  explanation: a
+        required: true
+      tags:
+        - transaction
+      responses:
+        '201':
+          description: Successful response.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                Invalid amount:
+                  value:
+                    error: Invalid amount
+                Missing parameter:
+                  value:
+                    error: 'Transaction validation failed: .* : Path `.*` is required.'
+                Parameter shorter than the minimum allowed length:
+                  value:
+                    error: Path `.*` (`.*`) is shorter than the minimum allowed length
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                Missing Authorization header:
+                  value:
+                    error: Missing Authorization header
+                Invalid token:
+                  value:
+                    error: Invalid token
+                Invalid Authorization header format:
+                  value:
+                    error: Invalid Authorization header format
+          description: Unauthorized
+        '402':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                Insufficient funds:
+                  value:
+                    error: Insufficient funds
+          description: Insufficient funds
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                accountFrom not found:
+                  value:
+                    error: accountFrom not found
+          description: Not found
+      security:
+        -
+          Baerer: []
+      operationId: createtransaction
+      summary: Create a transaction
+      description: Creates a new instance of a `transaction`.
 components:
   schemas:
     session:
@@ -163,6 +247,10 @@ components:
         name:
           description: ''
           type: string
+      example:
+        name: Steam
+        username: steamuser
+        password: novichok
     error:
       description: ''
       type: object
@@ -171,6 +259,25 @@ components:
           type: string
       example:
         error: error message
+    transaction:
+      title: Root Type for transaction
+      description: ''
+      type: object
+      properties:
+        accountFrom:
+          type: string
+        accountTo:
+          type: string
+        amount:
+          format: int32
+          type: integer
+        explanation:
+          type: string
+      example:
+        accountFrom: RU000000001
+        accountTo: BY000000001
+        amount: 1500000000
+        explanation: Explanation
   securitySchemes:
     Baerer:
       scheme: bearer
