@@ -11,10 +11,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 app.use(express.json())
 
 //endpoints
-app.use('/transactions/b2b', function (req, res){
-    console.log(req.body)
-    res.send({receiverName: "Jaan Tamm"})
-})
+
 app.use('/users', require('./routes/users'))
 app.use('/sessions', require('./routes/sessions'))
 app.use('/transactions', require('./routes/transactions'))
@@ -22,8 +19,10 @@ app.use('/transactions', require('./routes/transactions'))
 mongoose.connect(process.env.MONGODB_URI, {}, function(){
     console.log('Connected to mongoDB...')
 })
+
 processTransactions()
 
 app.listen(process.env.PORT, () => {
     console.log('listening on http://localhost:' + process.env.PORT);
 })
+
