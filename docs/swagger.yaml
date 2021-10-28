@@ -149,6 +149,33 @@ paths:
     description: >-
       The REST endpoint/path used to list and create zero or more `transaction` entities.  This path
       contains a `GET` and `POST` operation to perform the list and create tasks, respectively.
+    get:
+      tags:
+        - transaction
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: Successful response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                Missing Authorization header:
+                  value:
+                    error: Missing Authorization header
+                Invalid token:
+                  value:
+                    error: Invalid token
+                Invalid Authorization header format:
+                  value:
+                    error: Invalid Authorization header format
+          description: Unauthorized
+      security:
+        -
+          Baerer: []
     post:
       requestBody:
         description: A new `transaction` to be created.
@@ -159,11 +186,11 @@ paths:
             examples:
               POST /transaction:
                 value:
-                  accountFrom: 92c84bb50b65304f534480390cc90aafcbc
-                  accountTo: 92c88818551170b598016f5c7abf7b16891
-                  amount: 20
+                  accountFrom: 1b784bb50b65304f534480390cc90aafcbc
+                  accountTo: 1b788818551170b598016f5c7abf7b16891
+                  amount: 200
                   currency: EUR
-                  explanation: Money
+                  explanation: a
         required: true
       tags:
         - transaction

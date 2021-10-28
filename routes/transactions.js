@@ -200,8 +200,6 @@ router.get('/jwks', async function(req, res){
         const transactions = await Transaction.find({userId: req.userId})
 
         // Return them
-
         res.status(200).json(transactions)
-
     })
 module.exports = router
