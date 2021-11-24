@@ -6,6 +6,7 @@ const Account = require("./models/Account")
 const fetch = require("node-fetch")
 const jose = require('node-jose')
 const fs = require('fs')
+const nock = require("nock");
 
 exports.verifyToken = async (req, res, next) => {
 
@@ -45,6 +46,37 @@ exports.refreshListOfBanksFromCentralBank = async function refreshListOfBanksFro
     console.log('Refreshing list of banks')
 
     try {
+
+        let nockScope, nock
+
+        // Mock central bank responses in TEST_MODE
+        if(process.env.TEST_MODE === `true`) {
+
+            console.log(`TEST_MODE = true`);
+            nock = require('nock');
+            let url = new URL(process.env.CENTRAL_BANK_URL)
+            nock(url.protocol + '//' + url.host)
+                .persist()
+                .get(url.pathname)
+                .reply(200,
+                    [
+                        {
+                            "name": "fooBank",
+                            "transactionUrl": "http://foobank.com/transactions/b2b",
+                            "bankPrefix": "843",
+                            "owners": "John Smith",
+                            "jwsUrl": "http://foobank.diarainfra.com/jwks.json"
+                        },
+                        {
+                            "name": "barBank",
+                            "transactionUrl": "https://barbank.com/api/external/receive",
+                            "bankPrefix": "bar",
+                            "owners": "Jane Smith",
+                            "jwsUrl": "https://barbank.com/api/external/keys"
+                        }
+                    ]
+                )
+        }
 
         // Attempt to get JSON list of banks from central bank
         let banks = await fetch(process.env.CENTRAL_BANK_URL, {
@@ -194,6 +226,20 @@ exports.processTransactions = async function () {
             }
         }
 
+        // Actually send the request
+        const nock = require("nock")
+        let nockScope
+
+        if (process.env.TEST_MODE === "true") {
+            const nockUrl = new URL(accountToBank.transactionUrl)
+            console.log("Nocking " + JSON.stringify(nockUrl));
+
+            nockScope = nock(`${nockUrl.protocol}//${nockUrl.host}`)
+                .persist()
+                .post(nockUrl.pathname)
+                .reply(200, {receiverName: `fooBar`})
+        }
+
         try {
            const response = await sendRequestToDestinationBank(accountToBank, await createJwtString({
                 accountFrom: transaction.accountFrom,
@@ -204,7 +250,9 @@ exports.processTransactions = async function () {
                 senderName: transaction.senderName,
             }));
 
-           console.log(response)
+            // Debug
+            console.log(`loop: Made request to ` + accountToBank.transactionUrl)
+            console.log(response)
 
             if (!response.receiverName) {
                 return await setStatus(transaction, 'Failed', JSON.stringify((response)))

@@ -186,17 +186,17 @@ paths:
             examples:
               POST /transaction:
                 value:
-                  accountFrom: 1b784bb50b65304f534480390cc90aafcbc
-                  accountTo: 1b788818551170b598016f5c7abf7b16891
-                  amount: 200
+                  accountFrom: 92c84bb50b65304f534480390cc90aafcbc
+                  accountTo: 92c88818551170b598016f5c7abf7b16891
+                  amount: 20
                   currency: EUR
-                  explanation: a
+                  explanation: Mock
         required: true
       tags:
         - transaction
       responses:
         '201':
-          description: Successful response.
+          description: Created
         '400':
           content:
             application/json:
